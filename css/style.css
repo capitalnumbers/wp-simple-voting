@@ -1,0 +1,41 @@
+/* 
+    Plugin Styles
+*/
+
+
+.wsv_post {
+    float: left;
+    width: 100%;
+    padding: 8px 0px 20px 0;
+}
+
+span.vote {
+	background: url("../images/vote.jpg") repeat-x scroll 0 0 transparent;
+	border: 1px solid #FFFFFF;
+	border-radius: 5px 5px 5px 5px;
+	color: #FFFFFF;
+	cursor: pointer;
+	float: left;
+	font: bold 18px/30px arial;
+	height: 30px;
+	padding: 0 12px;
+}
+span.voted {
+	cursor: default;
+	background: url("../images/voted.jpg") no-repeat scroll 0 0 transparent;
+	color: #000000;
+	float: left;
+	font: bold 13px/32px arial;
+	height: 32px;
+	padding: 0 0 0 42px;
+        width: 100px;
+}
+
+.selectit.wsv {
+    padding-left: 10px;
+}
+
+.voting-select-meta {
+    padding: 10px 0;
+}
+
