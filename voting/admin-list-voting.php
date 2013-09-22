@@ -22,7 +22,9 @@ class WSAV_Voting_List_Table extends WP_List_Table {
                 'plural' => 'votes',
                 'ajax' => false
             ));
-            
+	}
+        
+        function get_vote_list() {
             global $wpdb;
             global $wsv_plugin_prefix;
             
@@ -57,13 +59,18 @@ class WSAV_Voting_List_Table extends WP_List_Table {
             $this->sql_vote    .= " WHERE p.post_type = 'post' AND p.post_status = 'publish' GROUP BY p.ID ORDER BY {$obtext} {$otext}";
 
             $this->vote_list    = $wpdb->get_results($this->sql_vote);
-	}
-	
-	function set_item_data() {
+        }
+
+
+        function set_item_data() {
             for ($i = 0; $i < count($this->vote_list); $i++) {
+                $this->item_data[$i]['reset_action'] = '';
                 $this->item_data[$i]['post_title'] = '<a target="_blank" href="'.get_permalink($this->vote_list[$i]->ID).'">'.$this->vote_list[$i]->post_title.'</a>';
                 $this->item_data[$i]['vote_count'] = (int) wsv_get_vote_count($this->vote_list[$i]->ID);
-                $this->item_data[$i]['reset_action'] = wsv_voting_reset_button('single', $this->vote_list[$i]->ID);
+                if (get_post_meta($this->vote_list[$i]->ID, '_wsv_voting_disabled', TRUE) == "on") { // If voting is DISABLED
+                    $this->item_data[$i]['reset_action'] = '<p class="wsv_vote_disabled">WARNING! Voting is disabled for this post</p>';
+                }
+                $this->item_data[$i]['reset_action'] .= wsv_voting_reset_button('single', $this->vote_list[$i]->ID);
             }
         }
 	
@@ -99,6 +106,7 @@ class WSAV_Voting_List_Table extends WP_List_Table {
 	 * Method to prepare items for view
 	 */
 	function prepare_items($show_per_page) {
+            $this->get_vote_list();
             $this->set_item_data();
             $per_page = $show_per_page;
             $columns = $this->get_columns();

@@ -12,14 +12,14 @@ function wsv_meta_box_voting() {
 // Callback function for voting meta box
 function wsv_mb_voting_cb() {
     global $post;
-    $values = get_post_custom( $post->ID ); var_dump($values);
-    $check = isset( $values['my_meta_box_check'] ) ? esc_attr( $values['my_meta_box_check'] ) : '';
+    $value = get_post_meta($post->ID, '_wsv_voting_disabled', TRUE);
+    if (isset($value) && esc_attr($value == "on")) $check = ' checked="checked"';
     
     wp_nonce_field('wsv_mb_voting_nonce', 'wsv_mb_nonce_value');
     
     echo '<div class="voting-select-meta">';
-    echo '<input type="checkbox" name="voting_select_checkbox" id="voting_select_checkbox" valye="on" />';
-    echo '<label class="selectit wsv" for="voting_select_checkbox">Enable Voting?</label>';
+    echo '<input type="checkbox" name="voting_disable_cb" id="voting_disable_cb" value="on"'.$check.' />';
+    echo '<label class="selectit wsv" for="voting_disable_cb">Disable Voting for this post?</label>';
     echo '</div>';
 }
 
@@ -30,10 +30,8 @@ function wsv_meta_box_voting_save($post_id) {
     if(!isset($_POST['wsv_mb_nonce_value']) || !wp_verify_nonce($_POST['wsv_mb_nonce_value'], 'wsv_mb_voting_nonce')) return;
     if(!current_user_can('edit_post')) return;
     
-    echo 'ss';die;
-
-    // This is purely my personal preference for saving check-boxes
-    $chk_value = isset($_POST['voting_select_checkbox']) && $_POST['voting_select_checkbox'] ? 'on' : 'off';
-    update_post_meta($post_id, '_wsv_voting_enabled', $chk_value);
+    // Saving vote option
+    $chk_value = (isset($_POST['voting_disable_cb']) && $_POST['voting_disable_cb']) ? 'on' : 'off';
+    update_post_meta($post_id, '_wsv_voting_disabled', $chk_value);
 }
 

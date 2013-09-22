@@ -64,14 +64,15 @@ function wsv_get_vote_count($post_id) {
  * Voting function
  **********************************************************************/
 function wsv_voting($post_id = '') {
-    $vclass = '';
-    $click_event = '';
-    $vtext = '';
-    
     if ($post_id == '') {
         global $post;
         $post_id = $post->ID;
     }
+    
+    $vclass = '';
+    $click_event = '';
+    $vtext = '';
+    $voting_disabled = get_post_meta($post_id, '_wsv_voting_disabled', TRUE);
     
     $votes = wsv_get_votes($post_id);
 
@@ -86,16 +87,16 @@ function wsv_voting($post_id = '') {
     
     $html  = '<div class="wsv_post">';
     $html .= '<div id="voting_area_outer_'.esc_attr($post_id).'">';
-    $html .= '<span id="vote_post_'.esc_attr($post_id).'"'.$click_event.' class="'.$vclass.'">'.$vtext.'</span>';
+    $html .= '<button id="vote_post_'.esc_attr($post_id).'"'.$click_event.' class="'.$vclass.'">'.$vtext.'</button>';
     $html .= '</div>';
     $html .= '</div>';
     
-    //if (get_field('enable_voting', $post_id) == "Yes") {
+    if (strtolower($voting_disabled) != "on") {
         if (!empty($_SESSION['wsv_has_voted']) && is_array($_SESSION['wsv_has_voted'])) {
             $vote_post_arr = $_SESSION['wsv_has_voted'];
             if (in_array($post_id, $vote_post_arr)) {
                 echo '<div class="wsv_post">';
-                echo '<span class="voted">Voted</span>';
+                echo '<button class="voted">Voted</span>';
                 echo '</div>';
             } else {
                 echo $html;
@@ -103,7 +104,7 @@ function wsv_voting($post_id = '') {
         } else {
             echo $html;
         }
-    //}
+    }
 }
 
 
@@ -112,16 +113,17 @@ function wsv_voting($post_id = '') {
  * eg. [wsv-vote] / [wsv-vote post_id="$post_id"]
  **********************************************************************/
 function sc_wsv_voting($atts) {
-    $vclass = '';
-    $click_event = '';
-    $vtext = '';
-    
     if ($atts['post_id'] == '') {
         global $post;
         $post_id = $post->ID;
     } else {
         $post_id = $atts['post_id'];
     }
+    
+    $vclass = '';
+    $click_event = '';
+    $vtext = '';
+    $voting_disabled = get_post_meta($post_id, '_wsv_voting_disabled', TRUE);
     
     $votes = wsv_get_votes($post_id);
     
@@ -140,7 +142,7 @@ function sc_wsv_voting($atts) {
     $html .= '</div>';
     $html .= '</div>';
     
-    //if (get_field('enable_voting', $post_id) == "Yes") {
+    if (strtolower($voting_disabled) != "on") {
         if (!empty($_SESSION['wsv_has_voted']) && is_array($_SESSION['wsv_has_voted'])) {
             $vote_post_arr = $_SESSION['wsv_has_voted'];
             if (in_array($post_id, $vote_post_arr)) {
@@ -153,7 +155,7 @@ function sc_wsv_voting($atts) {
         } else {
             echo $html;
         }
-    //}
+    }
 }
 add_shortcode('wsv-vote', 'sc_wsv_voting');
 

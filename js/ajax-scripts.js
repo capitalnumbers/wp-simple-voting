@@ -18,7 +18,7 @@ function getPostId(pid) {
             },
             beforeSend: function() {
                 var loadHtml  = '<span style="float:left; margin:10px 20px 0 0;">';
-                    loadHtml += '<img src="'+pluginurl+'/images/loading.gif">';
+                    loadHtml += '<img src="'+pluginurl+'/images/loading-round.gif">';
                     loadHtml += '</span>';
 
                 $("#voting_area_outer_"+postId).html(loadHtml);
@@ -29,10 +29,11 @@ function getPostId(pid) {
                 if (data == "s") {
                     afterLoadText = 'Voted';
                 } else {
-                    afterLoadText = '<strong style="color:#FF0000;">Error</strong>';
+                    afterLoadText = '<strong style="color:#000;">Error</strong>';
                 }
 
-                var afterLoadHtml = '<span id="vote_post_'+postId+'" class="voted">'+afterLoadText+'</span>';
+                //var afterLoadHtml = '<span id="vote_post_'+postId+'" class="voted">'+afterLoadText+'</span>';
+                var afterLoadHtml = '<button class="voted">'+afterLoadText+'</button>';
                 $("#voting_area_outer_"+postId).html(afterLoadHtml);
             },
             error: function (MLHttpRequest, textStatus, errorThrown) {
@@ -62,7 +63,8 @@ jQuery(function() {
                     },
                     beforeSend: function() {
                         var loadHtml  = '<span style="float:left; margin-left:30px;">';
-                            loadHtml += '<img src="'+siteurl+'/wp-admin/images/loading.gif">';
+                            //loadHtml += '<img src="'+siteurl+'/wp-admin/images/loading.gif">';
+                            loadHtml += '<img src="'+pluginurl+'/images/loading-round.gif">';
                             loadHtml += '</span>';
 
                         jQuery("#reset-area-outer-"+postId).html(loadHtml);
@@ -77,7 +79,7 @@ jQuery(function() {
                             }, 2000);
                         } else {
                             jQuery("#reset-area-outer-"+postId).html(afterLoadText);
-                            afterLoadText = '<strong style="color:#FF0000;">Error</strong>';
+                            afterLoadText = '<strong style="color:#000;">Error</strong>';
                         }
                     },
                     error: function (MLHttpRequest, textStatus, errorThrown) {
@@ -100,7 +102,8 @@ jQuery(function() {
                 },
                 beforeSend: function() {
                     var loadHtml  = '<span style="float:left; margin-left:30px;">';
-                        loadHtml += '<img src="'+siteurl+'/wp-admin/images/loading.gif">';
+                        //loadHtml += '<img src="'+siteurl+'/wp-admin/images/loading.gif">';
+                        loadHtml += '<img src="'+pluginurl+'/images/loading-round.gif">';
                         loadHtml += '</span>';
 
                     jQuery("#reset-area-outer-all").html(loadHtml);
@@ -115,7 +118,7 @@ jQuery(function() {
                         }, 2000);
                     } else {
                         jQuery("#reset-area-outer-all").html(afterLoadText);
-                        afterLoadText = '<strong style="color:#FF0000;">Error</strong>';
+                        afterLoadText = '<strong style="color:#000;">Error</strong>';
                     }
                 },
                 error: function (MLHttpRequest, textStatus, errorThrown) {

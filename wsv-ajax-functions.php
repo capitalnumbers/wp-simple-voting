@@ -32,27 +32,31 @@ function do_post_vote () {
     $vote_limit = 1;
     
     $data = sanitize_text_field($_POST['post_id']);
-    
-    if ($data != '') {
-        if (!in_array($data, $_SESSION['wsv_has_voted'])) { // If voted post id exists in session
-            $user_ip = wsv_get_user_ip();
-            $votes = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$tbl_vote} WHERE post_id = %d AND user_ip = %s", $data, $user_ip));
 
-            if ($votes != NULL && count($votes) >= $vote_limit) {
-                $response = json_encode(array('e'));
-            } else {
-                $ins_arr = array(
-                    'post_id'       => $data,
-                    'vote_count'    => 1,
-                    'user_ip'       => $user_ip
-                );
-                $vote_ins = $wpdb->insert($tbl_vote, $ins_arr);
-                if ($vote_ins) {
-                    array_push($_SESSION['wsv_has_voted'], $data);
-                    $response = json_encode(array('s'));
-                } else {
+    if ($data != '') {
+        if (get_post_meta($data, '_wsv_voting_disabled', TRUE) != "on") { // If voting is not disabled
+            if (!in_array($data, $_SESSION['wsv_has_voted'])) { // If voted post id exists in session
+                $user_ip = wsv_get_user_ip();
+                $votes = $wpdb->get_results($wpdb->prepare("SELECT * FROM {$tbl_vote} WHERE post_id = %d AND user_ip = %s", $data, $user_ip));
+
+                if ($votes != NULL && count($votes) >= $vote_limit) {
                     $response = json_encode(array('e'));
+                } else {
+                    $ins_arr = array(
+                        'post_id'       => $data,
+                        'vote_count'    => 1,
+                        'user_ip'       => $user_ip
+                    );
+                    $vote_ins = $wpdb->insert($tbl_vote, $ins_arr);
+                    if ($vote_ins) {
+                        array_push($_SESSION['wsv_has_voted'], $data);
+                        $response = json_encode(array('s'));
+                    } else {
+                        $response = json_encode(array('e'));
+                    }
                 }
+            } else {
+                $response = json_encode(array('e'));
             }
         } else {
             $response = json_encode(array('e'));

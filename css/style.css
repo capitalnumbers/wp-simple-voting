@@ -9,26 +9,13 @@
     padding: 8px 0px 20px 0;
 }
 
-span.vote {
-	background: url("../images/vote.jpg") repeat-x scroll 0 0 transparent;
-	border: 1px solid #FFFFFF;
-	border-radius: 5px 5px 5px 5px;
-	color: #FFFFFF;
-	cursor: pointer;
-	float: left;
-	font: bold 18px/30px arial;
-	height: 30px;
-	padding: 0 12px;
+.vote {
+    /* To be added later */
 }
-span.voted {
-	cursor: default;
-	background: url("../images/voted.jpg") no-repeat scroll 0 0 transparent;
-	color: #000000;
-	float: left;
-	font: bold 13px/32px arial;
-	height: 32px;
-	padding: 0 0 0 42px;
-        width: 100px;
+
+.voted {
+    opacity: 0.7;
+    cursor: default;
 }
 
 .selectit.wsv {
@@ -37,5 +24,17 @@ span.voted {
 
 .voting-select-meta {
     padding: 10px 0;
+}
+
+.wsv_vote_disabled {
+    float: right;
+    background: #FAD2D2;
+    border-radius: 3px;
+    color: #FF0000 !important;
+    font-weight: bold;
+    text-align: center;
+    margin-right: 10px !important;
+    padding: 6px;
+    width: 320px;
 }
 
