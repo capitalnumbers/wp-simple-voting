@@ -52,7 +52,7 @@ function wsv_get_vote_count($post_id) {
     $tbl_vote = $wpdb->prefix.$wsv_plugin_prefix."user_votes";
     $sql = $wpdb->prepare("SELECT count(id) AS total_votes FROM {$tbl_vote} WHERE post_id = %d", $post_id);
     $votes = $wpdb->get_row($sql);
-    
+
     if ($votes) {
         return $votes->total_votes;
     } else {
@@ -75,6 +75,7 @@ function wsv_voting($post_id = '') {
     $voting_disabled = get_post_meta($post_id, '_wsv_voting_disabled', TRUE);
     
     $votes = wsv_get_votes($post_id);
+    $votecount = wsv_get_vote_count($post_id);
 
     if ($votes === FALSE) {
         $vtext = "Voted";
@@ -87,7 +88,7 @@ function wsv_voting($post_id = '') {
     
     $html  = '<div class="wsv_post">';
     $html .= '<div id="voting_area_outer_'.esc_attr($post_id).'">';
-    $html .= '<button id="vote_post_'.esc_attr($post_id).'"'.$click_event.' class="'.$vclass.'">'.$vtext.'</button>';
+    $html .= '<button id="vote_post_'.esc_attr($post_id).'"'.$click_event.' class="'.$vclass.'" votecount="'.$votecount.'">'.$vtext.'</button>';
     $html .= '</div>';
     $html .= '</div>';
     
@@ -242,7 +243,11 @@ function wsv_do_voting_reset($type = 'single', $reset_post_id = '') {
 add_filter('the_content', 'wsv_add_voting_button_in_posts');
 function wsv_add_voting_button_in_posts($content) {
     $voting_btn_html = wsv_voting();
-    $content = $voting_btn_html . $content;
+    $vote_count_html = "";
+    if (get_option("_wsv_show_vote_count") == "on") {
+        $vote_count_html = '<p>Total votes: <strong id="vote-count-'.get_the_ID().'">' . wsv_get_vote_count(get_the_ID()) . '</strong></p>';
+    }
+    $content = $voting_btn_html . $vote_count_html . $content;
     return $content;
 }
 

@@ -8,7 +8,7 @@ if(!class_exists('WP_List_Table')) {
 }
 
 
-class WSAV_Voting_List_Table extends WP_List_Table {
+class WSV_Voting_List_Table extends WP_List_Table {
 
 	public      $item_data;
 	protected   $tbl_vote;
@@ -68,7 +68,7 @@ class WSAV_Voting_List_Table extends WP_List_Table {
                 $this->item_data[$i]['post_title'] = '<a target="_blank" href="'.get_permalink($this->vote_list[$i]->ID).'">'.$this->vote_list[$i]->post_title.'</a>';
                 $this->item_data[$i]['vote_count'] = (int) wsv_get_vote_count($this->vote_list[$i]->ID);
                 if (get_post_meta($this->vote_list[$i]->ID, '_wsv_voting_disabled', TRUE) == "on") { // If voting is DISABLED
-                    $this->item_data[$i]['reset_action'] = '<p class="wsv_vote_disabled">WARNING! Voting is disabled for this post</p>';
+                    $this->item_data[$i]['reset_action'] = '<p class="wsv_vote_disabled">Voting is disabled for this post</p>';
                 }
                 $this->item_data[$i]['reset_action'] .= wsv_voting_reset_button('single', $this->vote_list[$i]->ID);
             }
@@ -126,7 +126,7 @@ class WSAV_Voting_List_Table extends WP_List_Table {
         }
 }
 
-$votingListTable = new WSAV_Voting_List_Table();
+$votingListTable = new WSV_Voting_List_Table;
 
 ?>
 

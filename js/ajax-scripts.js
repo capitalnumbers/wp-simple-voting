@@ -5,7 +5,9 @@
 function getPostId(pid) {
     var pidArr = pid.split("_");
     var postId = pidArr[pidArr.length-1];
-
+    var voteCount = $("#vote_post_"+postId).attr("votecount");
+    if ($("#vote-counts-"+postId).length > 0)
+        alert($("#vote-count-"+postId).html());
     /* ================= Voing action ================= */
     if (postId) {
         jQuery.ajax({
@@ -35,6 +37,12 @@ function getPostId(pid) {
                 //var afterLoadHtml = '<span id="vote_post_'+postId+'" class="voted">'+afterLoadText+'</span>';
                 var afterLoadHtml = '<button class="voted">'+afterLoadText+'</button>';
                 $("#voting_area_outer_"+postId).html(afterLoadHtml);
+                
+                /*if (data == "s") {
+                    if ($("#vote-count-"+postId).length > 0) {
+                        $("#vote-count-"+postId).html(voteCount);
+                    }
+                }*/
             },
             error: function (MLHttpRequest, textStatus, errorThrown) {
                 alert('ERROR - '+errorThrown);
