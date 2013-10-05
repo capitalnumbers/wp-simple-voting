@@ -30,7 +30,6 @@ function do_post_vote () {
     
     // WILL BE IN OPTIONS LATER
     $vote_limit = 1;
-    
     $data = sanitize_text_field($_POST['post_id']);
 
     if ($data != '') {
@@ -50,19 +49,30 @@ function do_post_vote () {
                     $vote_ins = $wpdb->insert($tbl_vote, $ins_arr);
                     if ($vote_ins) {
                         array_push($_SESSION['wsv_has_voted'], $data);
-                        $response = json_encode(array('s'));
+                        $response = json_encode(array(
+                                'status' => 's',
+                                'total_votes' => wsv_get_vote_count($data)
+                            ));
                     } else {
-                        $response = json_encode(array('e'));
+                        $response = json_encode(array(
+                                'status' => 'e'
+                            ));
                     }
                 }
             } else {
-                $response = json_encode(array('e'));
+                $response = json_encode(array(
+                        'status' => 'e'
+                    ));
             }
         } else {
-            $response = json_encode(array('e'));
+            $response = json_encode(array(
+                    'status' => 'e'
+                ));
         }
     } else {
-        $response = json_encode(array('e'));
+        $response = json_encode(array(
+                'status' => 'e'
+            ));
     }
     
     echo $response;

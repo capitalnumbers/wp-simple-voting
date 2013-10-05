@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Custom Functions for wsv theme 
+ * Custom Functions for wsv plugin 
  */
 
 

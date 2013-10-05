@@ -2,12 +2,16 @@
  * Ajax scripts
  */
 
+function WsvRedirectPostType(pType) {
+    var listUrl = $("input[name=wsv_redirect_post_type_url]").val();
+    window.location.href = listUrl+'&posttype='+pType;
+}
+
+
 function getPostId(pid) {
     var pidArr = pid.split("_");
     var postId = pidArr[pidArr.length-1];
-    var voteCount = $("#vote_post_"+postId).attr("votecount");
-    if ($("#vote-counts-"+postId).length > 0)
-        alert($("#vote-count-"+postId).html());
+
     /* ================= Voing action ================= */
     if (postId) {
         jQuery.ajax({
@@ -28,8 +32,9 @@ function getPostId(pid) {
             success: function(data, textStatus, XMLHttpRequest) {
                 var afterLoadText = '';
 
-                if (data == "s") {
+                if (data.status == "s") {
                     afterLoadText = 'Voted';
+                    $("#vote-count-"+postId).html(data.total_votes);
                 } else {
                     afterLoadText = '<strong style="color:#000;">Error</strong>';
                 }

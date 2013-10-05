@@ -12,8 +12,8 @@ class WSV_Voting_List_Table extends WP_List_Table {
 
 	public      $item_data;
 	protected   $tbl_vote;
-        protected   $tbl_posts;
-        protected   $sql_vote;
+    protected   $tbl_posts;
+    protected   $sql_vote;
 	protected   $vote_list;
 
         function __construct() {
@@ -34,6 +34,8 @@ class WSV_Voting_List_Table extends WP_List_Table {
             
             $orderby = sanitize_text_field($_GET['orderby']);
             $order = sanitize_text_field($_GET['order']);
+            $posttype = sanitize_text_field($_GET['posttype']);
+            $posttype = empty($posttype) ? "post" : $posttype;
             
             switch ($orderby) {
                 case 'post_title' :
@@ -55,9 +57,7 @@ class WSV_Voting_List_Table extends WP_List_Table {
                     break;
             }
             
-            $this->sql_vote     = "SELECT *, count(v.vote_count) as total_votes FROM {$this->tbl_posts} AS p LEFT JOIN {$this->tbl_vote} AS v ON p.ID = v.post_id";
-            $this->sql_vote    .= " WHERE p.post_type = 'post' AND p.post_status = 'publish' GROUP BY p.ID ORDER BY {$obtext} {$otext}";
-
+            $this->sql_vote     = $wpdb->prepare("SELECT *, count(v.vote_count) as total_votes FROM {$this->tbl_posts} AS p LEFT JOIN {$this->tbl_vote} AS v ON p.ID = v.post_id WHERE p.post_type = '%s' AND p.post_status = 'publish' GROUP BY p.ID ORDER BY %s %s", $posttype, $obtext, $otext);
             $this->vote_list    = $wpdb->get_results($this->sql_vote);
         }
 
@@ -127,11 +127,22 @@ class WSV_Voting_List_Table extends WP_List_Table {
 }
 
 $votingListTable = new WSV_Voting_List_Table;
+$listPostType = sanitize_text_field($_GET['posttype']);
+$listPostType = empty($listPostType) ? "post" : $listPostType;
 
 ?>
 
 <div class="wrap">
     <h2><?php echo 'Voting List'; ?></h2>
+    <div class="wsv_list_sbox">
+        <label for="wsv_select_post_type_list">Select a Post Type: </label>
+        <select name="wsv_select_post_type_list" onchange="WsvRedirectPostType(this.value);">
+            <option value="">-</option>
+            <option value="post" <?php if ($listPostType == "post") echo 'selected="selected"'; ?>>Post</option>
+            <option value="page" <?php if ($listPostType == "page") echo 'selected="selected"'; ?>>Page</option>
+        </select>
+        <input type="hidden" name="wsv_redirect_post_type_url" value="<?php echo esc_attr(admin_url('admin.php?page=wsv-view-voting')); ?>">
+    </div>
     <span style="display:block; padding:10px;">
         <?php echo wsv_voting_reset_button('all'); ?>
     </span>

@@ -93,17 +93,27 @@ function wsv_voting($post_id = '') {
     $html .= '</div>';
     
     if (strtolower($voting_disabled) != "on") {
-        if (!empty($_SESSION['wsv_has_voted']) && is_array($_SESSION['wsv_has_voted'])) {
-            $vote_post_arr = $_SESSION['wsv_has_voted'];
-            if (in_array($post_id, $vote_post_arr)) {
-                echo '<div class="wsv_post">';
-                echo '<button class="voted">Voted</span>';
-                echo '</div>';
+        // Check if voting is enabled for pages
+        if ((get_post_type() == "post")
+            || (get_post_type() == "page" && get_option('_wsv_enable_voting_page') == "on")) {
+            if (!empty($_SESSION['wsv_has_voted']) && is_array($_SESSION['wsv_has_voted'])) {
+                $vote_post_arr = $_SESSION['wsv_has_voted'];
+                if (in_array($post_id, $vote_post_arr)) {
+                    echo '<div class="wsv_post">';
+                    echo '<button class="voted">Voted</span>';
+                    echo '</div>';
+                } else {
+                    echo $html;
+                }
             } else {
                 echo $html;
             }
-        } else {
-            echo $html;
+
+            $vote_count_html = "";
+            if (get_option("_wsv_show_vote_count") == "on") {
+                $vote_count_html = '<p>Total votes: <strong id="vote-count-'.$post_id.'">' . wsv_get_vote_count($post_id) . '</strong></p>';
+                echo $vote_count_html;
+            }
         }
     }
 }
@@ -243,11 +253,7 @@ function wsv_do_voting_reset($type = 'single', $reset_post_id = '') {
 add_filter('the_content', 'wsv_add_voting_button_in_posts');
 function wsv_add_voting_button_in_posts($content) {
     $voting_btn_html = wsv_voting();
-    $vote_count_html = "";
-    if (get_option("_wsv_show_vote_count") == "on") {
-        $vote_count_html = '<p>Total votes: <strong id="vote-count-'.get_the_ID().'">' . wsv_get_vote_count(get_the_ID()) . '</strong></p>';
-    }
-    $content = $voting_btn_html . $vote_count_html . $content;
+    $content = $voting_btn_html . $content;
     return $content;
 }
 

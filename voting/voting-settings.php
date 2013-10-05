@@ -15,7 +15,7 @@
 	$wsv_setting_submit_val		= sanitize_text_field($_POST['wsv_setting_submit']);
 	$wsv_enable_voting_page_val = sanitize_text_field($_POST['enable_voting_page']);
 	$wsv_show_vote_count_val	= sanitize_text_field($_POST['show_vote_count']);
-	$wsv_voting_cpt_list			= unserialize(get_option("_wsv_enable_voting_cpt"));
+	$wsv_voting_cpt_list		= unserialize(get_option("_wsv_enable_voting_cpt"));
 	
 	// Storing value for custom post type list
 	if (is_array($_POST['enable_voting_cpt'])) {
