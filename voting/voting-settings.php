@@ -40,7 +40,11 @@
 		}
 
 		// Show update message after options are updated
-		echo '<div class="updated below-h2" id="message"><p>Voting settings updated</p></div>';
+		echo '<div class="updated below-h2" id="message"><p>Voting settings saved</p></div>';
+
+		echo '<script>';
+		echo 'window.location.href = window.location.href';
+		echo '</script>';
 
 	}
 ?>
@@ -73,7 +77,7 @@
 			<?php endif; ?>
 
 			<tr valign="top">
-				<th scope="row"><label for="show_vote_count">Show vote count?</label></th>
+				<th scope="row"><label for="show_vote_count">Show voting button with vote count?</label></th>
 				<td><input type="checkbox" value="on" id="show_vote_count" name="show_vote_count"<?php if (get_option("_wsv_show_vote_count") == "on") echo ' checked="checked"'; ?>></td>
 			</tr>
 

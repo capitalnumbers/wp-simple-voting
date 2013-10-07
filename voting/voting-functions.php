@@ -50,6 +50,7 @@ function wsv_get_vote_count($post_id) {
     global $wsv_plugin_prefix;
     
     $tbl_vote = $wpdb->prefix.$wsv_plugin_prefix."user_votes";
+    
     $sql = $wpdb->prepare("SELECT count(id) AS total_votes FROM {$tbl_vote} WHERE post_id = %d", $post_id);
     $votes = $wpdb->get_row($sql);
 
@@ -59,6 +60,26 @@ function wsv_get_vote_count($post_id) {
         return FALSE;
     }
 }
+
+/**********************************************************************
+ * Get most voted posts
+ **********************************************************************/
+function wsv_get_top_voted($count) {
+    global $wpdb;
+    global $wsv_plugin_prefix;
+    $tbl_vote = $wpdb->prefix.$wsv_plugin_prefix."user_votes";
+    $tbl_posts = $wpdb->prefix.'posts';
+    
+    if ($count == '') {
+    $sql_vote_list = $wpdb->prepare("SELECT v.id AS vote_id, v.post_id, count(v.id) AS total_vote, p.post_title FROM {$tbl_posts} AS p JOIN {$tbl_vote} AS v ON p.ID = v.post_id WHERE p.post_type = 'post' AND p.post_status = 'publish' GROUP BY v.post_id ORDER BY total_vote DESC");
+    } else {
+        $sql_vote_list = $wpdb->prepare("SELECT v.id AS vote_id, v.post_id, count(v.id) AS total_vote, p.post_title FROM {$tbl_posts} AS p JOIN {$tbl_vote} AS v ON p.ID = v.post_id WHERE p.post_type = 'post' AND p.post_status = 'publish' GROUP BY v.post_id ORDER BY total_vote DESC LIMIT 0,%d", $count);
+    }
+    $vote_list = $wpdb->get_results($sql_vote_list);
+
+    return $vote_list;
+}
+
 
 /**********************************************************************
  * Voting function
@@ -73,6 +94,7 @@ function wsv_voting($post_id = '') {
     $click_event = '';
     $vtext = '';
     $voting_disabled = get_post_meta($post_id, '_wsv_voting_disabled', TRUE);
+    $allowed_cpt = unserialize(get_option('_wsv_enable_voting_cpt'));
     
     $votes = wsv_get_votes($post_id);
     $votecount = wsv_get_vote_count($post_id);
@@ -95,7 +117,8 @@ function wsv_voting($post_id = '') {
     if (strtolower($voting_disabled) != "on") {
         // Check if voting is enabled for pages
         if ((get_post_type() == "post")
-            || (get_post_type() == "page" && get_option('_wsv_enable_voting_page') == "on")) {
+            || (get_post_type() == "page" && get_option('_wsv_enable_voting_page') == "on")
+            || in_array(get_post_type(), $allowed_cpt)) {
             if (!empty($_SESSION['wsv_has_voted']) && is_array($_SESSION['wsv_has_voted'])) {
                 $vote_post_arr = $_SESSION['wsv_has_voted'];
                 if (in_array($post_id, $vote_post_arr)) {
@@ -255,5 +278,23 @@ function wsv_add_voting_button_in_posts($content) {
     $voting_btn_html = wsv_voting();
     $content = $voting_btn_html . $content;
     return $content;
+}
+
+
+/**********************************************************************
+ * Get list of allowed post types to be voted;
+ * includes pages and other custom post types
+ **********************************************************************/
+function wsv_get_allowed_post_types() {
+    $allowed_post_types = array('post');
+    if (get_option('_wsv_enable_voting_page') == "on") :
+       array_push($allowed_post_types, 'page');
+    endif;
+    $allowed_cpt = unserialize(get_option('_wsv_enable_voting_cpt'));
+    foreach ($allowed_cpt as $cpt) :
+        array_push($allowed_post_types, $cpt);
+    endforeach;
+
+    return $allowed_post_types;
 }
 

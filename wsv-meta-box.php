@@ -5,8 +5,17 @@
 
 add_action('add_meta_boxes', 'wsv_meta_box_voting');
 function wsv_meta_box_voting() {
-    //$allowed_post_types = array('post');
-    add_meta_box('wsv_mb_voting', 'WP Simple Voting', 'wsv_mb_voting_cb', 'post', 'side', 'high');
+    $allowed_post_types = get_option('_wsv_enable_voting_cpt');
+    $is_page_allowed = get_option('_wsv_enable_voting_page');
+    $allowed_post_types = unserialize($allowed_post_types);
+    array_push($allowed_post_types, 'post');
+    if ($is_page_allowed == "on") :
+        array_push($allowed_post_types, 'page');
+    endif;
+
+    foreach ($allowed_post_types as $pt) :
+        add_meta_box('wsv_mb_voting', 'WP Simple Voting', 'wsv_mb_voting_cb', $pt, 'side', 'high');
+    endforeach;
 }
 
 // Callback function for voting meta box

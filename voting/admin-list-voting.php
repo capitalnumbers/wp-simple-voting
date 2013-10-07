@@ -34,9 +34,22 @@ class WSV_Voting_List_Table extends WP_List_Table {
             
             $orderby = sanitize_text_field($_GET['orderby']);
             $order = sanitize_text_field($_GET['order']);
-            $posttype = sanitize_text_field($_GET['posttype']);
-            $posttype = empty($posttype) ? "post" : $posttype;
             
+            $posttype = sanitize_text_field($_GET['posttype']);
+            $posttype = empty($posttype) ? 'post' : $posttype;
+            
+            if ($posttype == "all") :
+                // To be added in class method later
+                $allowed_post_types_tbl = wsv_get_allowed_post_types();
+                for ($i=0; $i<count($allowed_post_types_tbl); $i++) :
+                    $allowed_post_types_tbl[$i] = "'".$allowed_post_types_tbl[$i]."'";
+                endfor;
+                $posttype = implode(",", $allowed_post_types_tbl);
+                // END
+            else :
+                $posttype = "'".$posttype."'";
+            endif;
+
             switch ($orderby) {
                 case 'post_title' :
                     $obtext = "p.post_title";
@@ -57,7 +70,7 @@ class WSV_Voting_List_Table extends WP_List_Table {
                     break;
             }
             
-            $this->sql_vote     = $wpdb->prepare("SELECT *, count(v.vote_count) as total_votes FROM {$this->tbl_posts} AS p LEFT JOIN {$this->tbl_vote} AS v ON p.ID = v.post_id WHERE p.post_type = '%s' AND p.post_status = 'publish' GROUP BY p.ID ORDER BY %s %s", $posttype, $obtext, $otext);
+            $this->sql_vote     = "SELECT *, count(v.vote_count) as total_votes FROM {$this->tbl_posts} AS p LEFT JOIN {$this->tbl_vote} AS v ON p.ID = v.post_id WHERE p.post_type IN ({$posttype}) AND p.post_status = 'publish' GROUP BY p.ID ORDER BY {$obtext} {$otext}";
             $this->vote_list    = $wpdb->get_results($this->sql_vote);
         }
 
@@ -127,6 +140,8 @@ class WSV_Voting_List_Table extends WP_List_Table {
 }
 
 $votingListTable = new WSV_Voting_List_Table;
+
+$allowed_post_types = wsv_get_allowed_post_types();
 $listPostType = sanitize_text_field($_GET['posttype']);
 $listPostType = empty($listPostType) ? "post" : $listPostType;
 
@@ -138,8 +153,14 @@ $listPostType = empty($listPostType) ? "post" : $listPostType;
         <label for="wsv_select_post_type_list">Select a Post Type: </label>
         <select name="wsv_select_post_type_list" onchange="WsvRedirectPostType(this.value);">
             <option value="">-</option>
-            <option value="post" <?php if ($listPostType == "post") echo 'selected="selected"'; ?>>Post</option>
-            <option value="page" <?php if ($listPostType == "page") echo 'selected="selected"'; ?>>Page</option>
+            <?php
+                foreach ($allowed_post_types as $pt) :
+                    $cpt_obj = get_post_type_object($pt);
+                    $select_txt = ($listPostType == $pt) ? 'selected="selected"' : '';
+                    echo '<option value="'.$pt.'"'.$select_txt.'>'.$cpt_obj->labels->singular_name.'</option>';
+                endforeach;
+            ?>
+            <option value="all"<?php if ($listPostType == "all") echo ' selected="selected"'; ?>>All Post Types</option>
         </select>
         <input type="hidden" name="wsv_redirect_post_type_url" value="<?php echo esc_attr(admin_url('admin.php?page=wsv-view-voting')); ?>">
     </div>
