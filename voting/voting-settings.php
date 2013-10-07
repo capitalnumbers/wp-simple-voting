@@ -61,13 +61,14 @@
 				<th scope="row"><label for="enable_voting_cpt">Enable voting in custom posts?</label></th>
 				<td>
 				<?php foreach ($wsv_custom_posts as $k=> $v) : ?>
+					<?php $cpt_obj = get_post_type_object($v); ?>
 					<fieldset>
 						<legend class="screen-reader-text">
 							<span>Enable voting in custom posts?</span>
 						</legend>
 						<label for="enable_voting_cpt_<?php echo $k; ?>">
 							<input type="checkbox" value="<?php echo $k; ?>" id="enable_voting_cpt_<?php echo $k; ?>" name="enable_voting_cpt[]"<?php if (in_array($k, $wsv_voting_cpt_list)) echo ' checked="checked"'; ?>>
-							<span><?php echo $v; ?></span>
+							<span><?php echo $cpt_obj->labels->singular_name; ?></span>
 						</label>
 						<br>						
 					</fieldset>

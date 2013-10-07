@@ -64,17 +64,23 @@ function wsv_get_vote_count($post_id) {
 /**********************************************************************
  * Get most voted posts
  **********************************************************************/
-function wsv_get_top_voted($count) {
+function wsv_get_top_voted($count, $post_type = 'post') {
     global $wpdb;
     global $wsv_plugin_prefix;
     $tbl_vote = $wpdb->prefix.$wsv_plugin_prefix."user_votes";
     $tbl_posts = $wpdb->prefix.'posts';
-    
-    if ($count == '') {
-    $sql_vote_list = $wpdb->prepare("SELECT v.id AS vote_id, v.post_id, count(v.id) AS total_vote, p.post_title FROM {$tbl_posts} AS p JOIN {$tbl_vote} AS v ON p.ID = v.post_id WHERE p.post_type = 'post' AND p.post_status = 'publish' GROUP BY v.post_id ORDER BY total_vote DESC");
+    if ($post_type == "all") {
+        $post_type_tmp = wsv_get_allowed_post_types();
+        for ($i=0; $i<count($post_type_tmp); $i++) {
+            $post_type_tmp[$i] = "'".$post_type_tmp[$i]."'";
+        }
+        $post_type = implode(",", $post_type_tmp);
     } else {
-        $sql_vote_list = $wpdb->prepare("SELECT v.id AS vote_id, v.post_id, count(v.id) AS total_vote, p.post_title FROM {$tbl_posts} AS p JOIN {$tbl_vote} AS v ON p.ID = v.post_id WHERE p.post_type = 'post' AND p.post_status = 'publish' GROUP BY v.post_id ORDER BY total_vote DESC LIMIT 0,%d", $count);
+        $post_type = "'".$post_type."'";
     }
+    
+    $sql_vote_list = "SELECT v.id AS vote_id, v.post_id, count(v.id) AS total_vote, p.post_title, p.post_type FROM {$tbl_posts} AS p JOIN {$tbl_vote} AS v ON p.ID = v.post_id WHERE p.post_type IN ({$post_type}) AND p.post_status = 'publish' GROUP BY v.post_id ORDER BY total_vote DESC";
+    if ($count != '') $sql_vote_list .= " LIMIT 0,{$count}";
     $vote_list = $wpdb->get_results($sql_vote_list);
 
     return $vote_list;
