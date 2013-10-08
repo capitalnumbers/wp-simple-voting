@@ -303,4 +303,3 @@ function wsv_get_allowed_post_types() {
 
     return $allowed_post_types;
 }
-

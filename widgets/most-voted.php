@@ -12,16 +12,28 @@ class WSVShowMostVotedWidget extends WP_Widget
         );
 	}
 
-	public function showMostVoted($title, $count, $post_type, $show_post_type) {
+	public function showMostVoted($title, $count, $post_type, $show_post_type, $bwidget, $awidget, $btitle, $atitle) {
         $voting_list = wsv_get_top_voted($count, $post_type);
+        $pt_param_obj = get_post_type_object($post_type);
 
-        // Widget default wrapper
-        echo '<aside class="widget masonry-brick">';
-
-        if ($title != '') :
-            echo '<h3 class="widget-title">'.esc_attr($title).'</h3>';
+        if ($post_type == "all") :
+            $default_title = "Most Voted Contents";
         else :
-            echo '<h3 class="widget-title">Most Voted Posts</h3>';
+            $default_title = "Most Voted ".$pt_param_obj->labels->singular_name;
+        endif;
+
+        if ($title) :
+            $title = apply_filters('widget_title', $title);
+        else :
+            $title = apply_filters('widget_title', $default_title);
+        endif;
+
+        // Default widget wrapper start
+        echo $bwidget;
+
+        // Widget title
+        if ($title) :
+            echo $btitle . $title . $atitle;
         endif;
 
         if ($voting_list === FALSE) :
@@ -46,12 +58,13 @@ class WSVShowMostVotedWidget extends WP_Widget
 
 
         //Widget default wrapper close
-        echo '</aside>';
+        echo $awidget;
 	}
 
 	function widget($args, $instance) {
+        extract($args);
         if ($instance['wsv_widget_most_voted_count'] != '') {
-            $this->showMostVoted($instance['wsv_widget_most_voted_title'], $instance['wsv_widget_most_voted_count'], $instance['wsv_widget_most_voted_cpt'], $instance['wsv_widget_most_voted_show_cpt']);
+            $this->showMostVoted($instance['wsv_widget_most_voted_title'], $instance['wsv_widget_most_voted_count'], $instance['wsv_widget_most_voted_cpt'], $instance['wsv_widget_most_voted_show_cpt'], $before_widget, $after_widget, $before_title, $after_title);
         }
 	}
 	

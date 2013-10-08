@@ -199,4 +199,3 @@ $listPostType = empty($listPostType) ? "post" : $listPostType;
         $votingListTable->display();
     ?>
 </div>
-
