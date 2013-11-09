@@ -21,8 +21,6 @@ $wsv_plugin_version = 1.0;
  **********************************************************************/
 include_once 'wsv-custom-functions.php';
 include_once 'wsv-meta-box.php';
-// Widgets include
-include_once 'widgets/most-voted.php';
 
 
 /* ======================================================================
